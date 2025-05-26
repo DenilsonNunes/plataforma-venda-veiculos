@@ -10,8 +10,6 @@ import Register from "./pages/register";
 
 
 
-
-
 const routes = createBrowserRouter([
   {
     element: <Layout/>,

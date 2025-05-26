@@ -9,7 +9,7 @@ const Header = () => {
   const loadingAuth = false;
 
   return (
-    <div className="w-full flex items-center justify-center h-16 bg-white drop-shadow-2xl mb-4">
+    <div className="w-full flex items-center justify-center h-16 bg-white drop-shadow-lg mb-4">
       <header className="w-full max-w-7xl flex items-center justify-between px-4 mx-auto">
 
         <Link to='/'>

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logoImg from '../../assets/logo.svg'
 
 import Container from "../../components/container"
@@ -8,6 +8,9 @@ import Input from '../../components/input'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { auth } from '../../services/firebaseConnection'
+import { useEffect } from 'react'
 
 
 
@@ -24,13 +27,34 @@ type FormData = z.infer<typeof schema>
 
 const Login = () => {
 
+  const navigate = useNavigate();
+
+
   const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: 'onChange'
   })
 
+  useEffect(() => {
+    const handleLogout = async () => {
+      await signOut(auth)
+    }
+
+    handleLogout();
+  }, [])
+
+
+
+
   const onSubmit = (data: FormData) => {
-    console.log(data)
+    signInWithEmailAndPassword(auth, data.email, data.password)
+    .then((user) => {
+      console.log('Logado com sucesso!', user)
+      navigate('/dashboard', {replace: true})
+    })
+    .catch((error) => {
+      console.log('Error ao logar:', error)
+    }) 
   }
 
 

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logoImg from '../../assets/logo.svg'
 
 import Container from "../../components/container"
@@ -8,6 +8,10 @@ import Input from '../../components/input'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { auth } from '../../services/firebaseConnection'
+import { createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth'
+import { useContext, useEffect } from 'react'
+import { AuthContext } from '../../contexts/AuthContext'
 
 
 
@@ -25,13 +29,46 @@ type FormData = z.infer<typeof schema>
 
 const Register = () => {
 
+  const navigate = useNavigate();
+
+  const { handleInfoUser } = useContext(AuthContext)
+
+
+
   const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: 'onChange'
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log(data)
+  useEffect(() => {
+    const handleLogout = async () => {
+      await signOut(auth)
+    }
+
+    handleLogout();
+  }, [])
+  
+
+  const onSubmit = async (data: FormData) => {
+
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+    .then(async (user)=> {
+      await updateProfile(user.user, {
+        displayName: data.name
+      })
+
+      handleInfoUser({
+        name: data.name,
+        email: data.email,
+        uid: user.user.uid
+      })
+
+      navigate('/dashboard', {replace: true})
+
+    })
+    .catch((error) => {
+
+    })
   }
 
 

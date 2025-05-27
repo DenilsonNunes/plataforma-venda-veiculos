@@ -149,7 +149,7 @@ const New = () => {
           </div>
 
           <div className="w-full">
-            <p className="mb-2 font-medium">Descição</p>
+            <p className="mb-2 font-medium">Descrição</p>
             <textarea 
               className="w-full border-1 border-slate-300 rounded-md h-24 px-2"
               {...register('description')}

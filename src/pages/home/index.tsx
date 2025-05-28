@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import Container from "../../components/container"
 
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { Link } from "react-router-dom";
 
@@ -31,11 +31,16 @@ const Home = () => {
 
   const [cars, setCars] = useState<CarsProps[]>([])
   const [loadingImages, setLoadImages] = useState<string[]>([])
+  const [inputSearchCar, setInputSearchCar] = useState('')
 
 
   useEffect(()=> {
 
-    const loadCars = () => {
+    loadCars();
+
+  },[])
+
+  const loadCars = () => {
       const carsRef = collection(db, 'cars')
       const queryRef = query(carsRef, orderBy('created', 'desc'))
 
@@ -59,10 +64,7 @@ const Home = () => {
         setCars(listCars);
 
       })
-    }
-
-    loadCars();
-  })
+  }
 
 
 
@@ -70,14 +72,61 @@ const Home = () => {
     setLoadImages((prevImageLoaded) => [...prevImageLoaded, id])
   }
 
+  const handleSearchCar = async () => {
+
+
+    if(inputSearchCar === '') {
+      loadCars();
+      return;
+    }
+
+    setCars([]);
+    setLoadImages([]);
+
+    const q = query(collection(db, 'cars'), 
+      where('name', '>=', inputSearchCar.toUpperCase()),
+      where('name', '<=', inputSearchCar.toUpperCase() + '\uf8ff')
+    )
+
+
+    const querySnapshot = await getDocs(q);
+
+    const listCars = [] as CarsProps[];
+
+    querySnapshot.forEach((doc) => {
+      listCars.push({
+        id: doc.id,
+        name: doc.data().name,
+        year: doc.data().year,
+        km: doc.data().km,
+        city: doc.data().city,
+        price: doc.data().price,
+        images: doc.data().images,
+        uid: doc.data().uid
+      })
+    })
+
+    console.log('AQUI', listCars)
+
+    setCars(listCars)
+
+
+  }
 
 
   return (
     <Container>
       <section className="w-full max-w-3xl mx-auto p-4 rounded-lg flex justify-center items-center gap-2 bg-white">
-        <input className="w-full border-1 border-gray-400 rounded-lg h-9 px-3 outline-none" type="text" placeholder="Digite o nome do carro..." />
+        <input 
+          className="w-full border-1 border-gray-400 rounded-lg h-9 px-3 outline-none" 
+          type="text" 
+          placeholder="Digite o nome do carro..." 
+          value={inputSearchCar}
+          onChange={(e) => setInputSearchCar(e.target.value)}
+        />
         <button 
           className="bg-red-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
+          onClick={handleSearchCar}
         >
           Buscar
         </button>
@@ -87,8 +136,8 @@ const Home = () => {
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 
         {cars.map((car) => (
-          <Link to={`/car/${car.id}`}>
-            <section className="w-full bg-white  rounded-lg">
+          <Link key={car.id} to={`/car/${car.id}`}>
+            <section  className="w-full bg-white  rounded-lg">
               
               <div 
                 className="w-full h-72 rounded-lg bg-slate-200" 

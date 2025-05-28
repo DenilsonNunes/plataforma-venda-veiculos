@@ -9,6 +9,7 @@ import { AuthContext } from "../../contexts/AuthContext"
 
 import DashboardHeader from "../../components/panelheader"
 import Container from "../../components/container"
+import toast from "react-hot-toast"
 
 
 
@@ -91,7 +92,7 @@ const Dashboard = () => {
         setCars(cars.filter(car => car.id !== itemCar.id))
 
       } catch(err){
-        console.log('Erro ao excluir essa imagem', err)
+        toast.error('Erro ao deletar imagem')
       }
 
     })

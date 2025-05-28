@@ -14,6 +14,7 @@ import {v4 as uuidV4} from 'uuid'
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { db, storage } from "../../../services/firebaseConnection"
 import { addDoc, collection } from "firebase/firestore"
+import toast from "react-hot-toast"
 
 
 
@@ -57,7 +58,7 @@ const New = () => {
   const onSubmit = (data: FormData) => {
 
     if(carImages.length === 0){
-      alert("Envie alguma imagem deste carro!")
+      toast.error('Envie pelo menos 1 imagem')
       return;
     }
 
@@ -71,7 +72,7 @@ const New = () => {
     })
 
     addDoc(collection(db, 'cars'), {
-      name: data.name,
+      name: data.name.toUpperCase(),
       model: data.model,
       whatsapp: data.whatsapp,
       city: data.city,
@@ -87,10 +88,11 @@ const New = () => {
     .then(() => {
       reset()
       setCarImages([])
-      console.log('Cadastrado com sucesso!')
+      toast.success('Carro cadastrado com sucesso!')
+
     })
     .catch((err) => {
-      console.log('Erro ao cadastrar no banco: ', err)
+      toast.error('Erro ao realizar o cadastro')
     })
 
 
@@ -107,7 +109,7 @@ const New = () => {
       if(image.type === 'image/jpeg' || image.type === 'image/png'){
         await handleUpload(image)
       } else {
-        alert('Envie uma imagem jpeg ou png!')
+        toast.error('Erro ao importar a imagem')
         return;
       }
     }
@@ -138,11 +140,12 @@ const New = () => {
         }
 
         setCarImages((images)=> [...images, imageItem])
+        toast.success('Imagem cadastrada com sucesso!')
 
       })
     })
     .catch((err) => {
-      console.log('Deu erro:', err)
+      toast.error('Erro ao cadastrar imagem')
     })
   }
 
@@ -152,10 +155,12 @@ const New = () => {
     const imageRef = ref(storage, imagePath);
 
     try {
+
       await deleteObject(imageRef)
       setCarImages(carImages.filter((car)=> car.url !== item.url))
+
     } catch(err){
-      console.log('Erro ao deletar', err)
+      toast.error('Erro ao deletar imagem')
     }
 
   }

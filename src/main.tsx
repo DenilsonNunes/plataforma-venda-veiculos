@@ -6,6 +6,10 @@ import './index.css'
 
 import { routes } from './App.tsx'
 import AuthProvider from './contexts/AuthContext.tsx'
+import { register } from 'swiper/element/bundle';
+// register Swiper custom elements
+register();
+import './swipercss.css'
 
 
 createRoot(document.getElementById('root')!).render(

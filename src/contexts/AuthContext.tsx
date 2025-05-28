@@ -64,9 +64,11 @@ const AuthProvider = ({children}: AuthProviderProps) => {
     })
   }
 
+
+
   return (
 
-    <AuthContext.Provider value={{signed: !!user, loadingAuth, handleInfoUser}}>
+    <AuthContext.Provider value={{signed: !!user, loadingAuth, handleInfoUser, user}}>
       {children}
     </AuthContext.Provider>
 
